@@ -336,3 +336,115 @@ class RenderStage(AnimationStage):
 
         return context
 
+
+class AgentMemory:
+    """LLM-facing compressed memory"""
+
+    def __init__(self, system_prompt: str):
+        self.messages: list[Message] = [
+            Message(role="system", content=system_prompt)
+        ]
+
+    def add_user(self, content: str):
+        self.messages.append(Message(role="user", content=content))
+
+    def add_assistant(self, content: str, tool_calls=None):
+        self.messages.append(
+            Message(role="assistant", content=content, tool_calls=tool_calls)
+        )
+
+    def add_tool(self, name: str, content: str, tool_call_id: str):
+        self.messages.append(
+            Message(
+                role="tool",
+                name=name,
+                tool_call_id=tool_call_id,
+                content=content,
+            )
+        )
+
+    def snapshot(self) -> list[Message]:
+        return self.messages.copy()
+
+
+class AnimationAgent:
+    """
+    Core Agent for animation / cinematic content generation
+    """
+
+    def __init__(
+        self,
+        llm: LLMClient,
+        tools: list[Tool],
+        system_prompt: str,
+        max_steps: int = 30,
+    ):
+        self.llm = llm
+        self.tools = {t.name: t for t in tools}
+        self.max_steps = max_steps
+
+        self.memory = AgentMemory(system_prompt)
+        self.context = AnimationContext()
+
+    def add_task(self, user_prompt: str):
+        self.memory.add_user(user_prompt)
+
+    async def run(self) -> str:
+        """
+        Main animation generation loop:
+        - plan → generate → refine
+        """
+        for step in range(self.max_steps):
+            response = await self.llm.generate(
+                messages=self.memory.snapshot(),
+                tools=list(self.tools.values()),
+            )
+
+            self.memory.add_assistant(
+                content=response.content,
+                tool_calls=response.tool_calls,
+            )
+
+            # Stop condition: no more tool calls
+            if not response.tool_calls:
+                return response.content
+
+            # Execute animation-related tools
+            for call in response.tool_calls:
+                result = await self._execute_tool(call)
+                self.memory.add_tool(
+                    name=call.function.name,
+                    content=result,
+                    tool_call_id=call.id,
+                )
+
+        return "Animation generation stopped: max steps reached."
+
+    async def _execute_tool(self, tool_call) -> str:
+        name = tool_call.function.name
+        args = tool_call.function.arguments
+
+        if name not in self.tools:
+            return f"Error: unknown tool {name}"
+
+        tool = self.tools[name]
+        result: ToolResult = await tool.execute(**args)
+
+        if not result.success:
+            return f"Error: {result.error}"
+
+        # Optional: update animation context
+        self._update_context(name, result.content)
+        return result.content
+
+    def _update_context(self, tool_name: str, content: str):
+        """
+        Update animation world state based on tool output
+        """
+        if tool_name == "create_scene":
+            self.context.add_scene(
+                Scene(
+                    id=f"scene_{len(self.context.scenes)+1}",
+                    description=content,
+                )
+            )
