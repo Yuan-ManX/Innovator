@@ -303,3 +303,36 @@ class AnimationAgent:
         return self.context
 
 
+# ===========================
+# Render Stage（画面生成）
+# ===========================
+
+class RenderStage(AnimationStage):
+    """
+    RenderStage 将 Timeline 的 Shots 转换成图像序列或视频。
+    """
+
+    name = "render"
+
+    def __init__(self, renderer):
+        """
+        renderer: 必须实现
+            async render_shot(shot: Shot) -> str
+        返回：生成图像/视频路径
+        """
+        self.renderer = renderer
+
+    async def run(self, context: AnimationContext) -> AnimationContext:
+        """
+        遍历 Timeline 中的所有 Shots，生成视频帧或渲染图像，
+        并在 Shot 中记录渲染结果路径。
+        """
+        for scene in context.timeline.scenes:
+            for shot in scene.shots:
+                # 调用渲染接口
+                render_path = await self.renderer.render_shot(shot)
+                # 写回 Shot
+                shot.render_output = render_path
+
+        return context
+
