@@ -62,7 +62,7 @@ retry:
 # ============================================================
 max_steps: 100             # Maximum execution steps
 workspace_dir: "./workspace"  # Working directory
-system_prompt_path: "system_prompt.md"  # System prompt file
+system_prompt_path: "../prompts/system_prompt.md"  # System prompt file
 
 # ============================================================
 # Agent Routing / Planner Configuration
