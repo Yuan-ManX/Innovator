@@ -43,7 +43,7 @@ Innovator integrates:
 - **Large Language Models (LLMs)** for reasoning and narrative
 - **Memory & Continuity Systems** to track state across sessions
 - **Planning Layers** for multi‑stage workflows
-- **Tool Orchestration** to dispatch tasks to generation APIs
+- **Tool Orchestration** to dispatch tasks to generation AI Model
 - **Conditional Routing & Confidence Scoring** to ensure workflow correctness
 
 Innovator provides a foundation for automation in:
