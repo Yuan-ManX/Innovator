@@ -1,0 +1,107 @@
+# ============================================================
+# Innovator Agent Configuration
+# A General AI Agent Framework for Animation, Film & Game Creation
+# ============================================================
+
+# ============================================================
+# LLM & Generative Model Configuration
+# ============================================================
+# Supports multiple LLM providers and generative models.
+# You can configure API endpoints and models for LLMs, video, audio, and image generation.
+#
+# Supported LLM Providers: anthropic, openai
+# Supported Video Models:
+# Supported Audio Models: 
+# Supported Image Models: 
+
+llm:
+  api_key: "YOUR_LLM_API_KEY_HERE"
+  api_base: ""
+  model: "gpt-5.2"
+  provider: "openai"
+  timeout: 60          # Max request timeout in seconds
+  batch_size: 1        # Number of messages per request
+  fallback_provider: "anthropic"  # Automatic fallback if primary fails
+
+video_model:
+  api_key: "YOUR_VIDEO_API_KEY_HERE"
+  api_base: ""
+  model: ""
+  timeout: 300         # Video generation may take longer
+  batch_size: 1
+  fallback_provider: ""
+
+audio_model:
+  api_key: "YOUR_AUDIO_API_KEY_HERE"
+  api_base: ""
+  model: ""
+  timeout: 120
+  batch_size: 2
+  fallback_provider: ""
+
+image_model:
+  api_key: "YOUR_IMAGE_API_KEY_HERE"
+  api_base: ""
+  model: ""
+  timeout: 180
+  batch_size: 4
+  fallback_provider: ""
+
+# ============================================================
+# Retry Configuration
+# ============================================================
+retry:
+  enabled: true
+  max_retries: 3
+  initial_delay: 1.0
+  max_delay: 60.0
+  exponential_base: 2.0
+
+# ============================================================
+# Agent Configuration
+# ============================================================
+max_steps: 100             # Maximum execution steps
+workspace_dir: "./workspace"  # Working directory
+system_prompt_path: "system_prompt.md"  # System prompt file
+
+# ============================================================
+# Agent Routing / Planner Configuration
+# ============================================================
+# Defines the default routing and fallback logic for tasks
+agent_routing:
+  planner_entry: true        # Tasks always start from planner
+  default_fallback: PLANNER  # Fallback agent if routing fails
+  confidence_threshold: 0.65 # Minimum confidence to auto-route
+  review_required_for:       # Stages requiring human review or automated checks
+    - RENDER
+    - GAME
+  routing_map:                # Task type → preferred execution agent
+    animation: ANIMATION
+    film: FILM
+    cinematic: FILM
+    game: GAME
+    mixed:
+      - ANIMATION
+      - FILM
+      - GAME
+
+# ============================================================
+# Tools Configuration
+# ============================================================
+tools:
+  # Basic tool switches
+  enable_file_tools: true    # File read/write/edit tools
+  enable_bash: true          # Bash command execution tool
+  enable_note: true          # Memory tool
+  
+  # Skills
+  enable_skills: true        # Enable Skills
+  skills_dir: "./skills"     # Skills directory path
+  
+  # MCP Tools
+  enable_mcp: true
+  mcp_config_path: "mcp.json"
+  mcp:
+    connect_timeout: 10.0    # Connection timeout (seconds)
+    execute_timeout: 60.0    # Tool execution timeout (seconds)
+    sse_read_timeout: 120.0  # SSE read timeout (seconds)
