@@ -12,6 +12,7 @@ from innovator.agent_router import (
     game_agent_score,
 )
 
+
 def main():
     # Initialize router with confidence threshold and fallback
     router = AgentRouter(confidence_threshold=0.65, fallback_agent=AgentType.PLANNER)
@@ -48,6 +49,7 @@ def main():
         if current_agent == AgentType.RENDER:
             # For testing, we can toggle between 'accept', 'revise', 'redesign'
             context["review_result"] = "accept"  # change to test iterative loops
+
 
 if __name__ == "__main__":
     main()
