@@ -88,3 +88,16 @@ Please refer to [LICENSE](LICENSE).
 
 ---
 
+
+## Cite Innovator
+
+If you use `Innovator` in your publication, please cite it by using the following BibTeX entry.
+
+```bibtex
+@Misc{Innovator,
+  title =        {`Innovator — A General AI Agent Framework for Animation, Film & Game Creation.},
+  author =       {Yuan Man},
+  howpublished = {\url{https://github.com/Yuan-ManX/Innovator}},
+  year =         {2025}
+}
+```
